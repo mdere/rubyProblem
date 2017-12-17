@@ -32,7 +32,7 @@ class Currency
   # mapping <Hash>
   def create_currency_mapping(mapping_name, mapping)
     if mapping_name_is_valid(mapping_name) && mapping_is_valid(mapping)
-      this.currency_mappings[mapping_name] = mapping
+      @currency_mappings[mapping_name] = mapping
     end
   end
 
@@ -56,6 +56,10 @@ class Currency
     return @currency_mappings[map_name]
   end
 
+  def get_current_currency_map_info()
+    return @selected_mapping
+  end
+
   def change_for(value)
     sanitizedValue = sanitize(value)
     if sanitizedValue && sanitizedValue > 0
@@ -73,25 +77,23 @@ class Currency
     end
   end
 
-  def update_value(value)
-
-    return value
-  end
-
   def create_mem_store()
     # take @selected_mapping and build the mem_store
     # start with currency_data
     @selected_mapping_mem_store = {
       currency_data: {},
-      map_order: []
+      map_order: nil
     }
-    puts @selected_mapping
+    map_order = []
     @selected_mapping.each do |key, value|
       @selected_mapping_mem_store[:currency_data][key] = 0
-      @selected_mapping_mem_store[:map_order].push([key, value])
+      map_order.push([key, value])
     end
-    # @selected_mapping_mem_store[:map_order].sort!{|x,y| y[1] <=> x[1]}
-    puts "current selected mem store #{@selected_mapping_mem_store}"
+    # This will ensure that during processing will process the
+    # largest denomination first, so that process currency for
+    # could have smaller logic
+    map_order.sort!{|x,y| y[1] <=> x[1]}
+    @selected_mapping_mem_store[:map_order] = map_order
   end
 
   def sanitize(value)
