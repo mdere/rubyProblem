@@ -33,6 +33,8 @@ class Currency
   def create_currency_mapping(mapping_name, mapping)
     if mapping_name_is_valid(mapping_name) && mapping_is_valid(mapping)
       @currency_mappings[mapping_name] = mapping
+    else
+      raise "Failed to create currency mapping, please check parameters and try again"
     end
   end
 
@@ -41,6 +43,8 @@ class Currency
       @selected_mapping = nil
       @selected_mapping = @currency_mappings[map_name]
       create_mem_store()
+    else
+      raise "#{map_name} does not exist"
     end
   end
 
@@ -61,12 +65,14 @@ class Currency
   end
 
   def change_for(value)
+    create_mem_store()
     sanitizedValue = sanitize(value)
     if sanitizedValue && sanitizedValue > 0
-      create_mem_store()
-      process_currency_for(value)
+      process_currency_for(sanitizedValue)
+      return @selected_mapping_mem_store[:currency_data]
+    else
+      raise "Cannot accept value #{value} of type #{value.class}"
     end
-    return @selected_mapping_mem_store[:currency_data]
   end
 
   private
@@ -112,7 +118,7 @@ class Currency
   end
 
   def mapping_exists(mapping_name)
-    return true
+    return @currency_mappings[mapping_name] && !@currency_mappings[mapping_name].empty?
   end
 
   # for now I will only accept symbols
@@ -121,7 +127,16 @@ class Currency
   end
 
   # Check if there are valid key and value
-  def mapping_is_valid(mapping_value)
+  def mapping_is_valid(mapping)
+    # lets make sure mapping and keys exist first
+    if mapping && mapping.keys.length > 0
+      # Lets checks if keys are valid
+      mapping.each do |key, value|
+        if !(key && key.class == Symbol && value && value.to_i > 0)
+          return false
+        end
+      end
+    end
     return true
   end
 
