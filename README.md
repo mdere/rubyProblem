@@ -22,8 +22,8 @@
 We are looking for something that could potentially be used as a robust, production-quality solution. So, please take your time before submitting your solution. Be preapred to talk about your code during the next round of interviews.
 
 ## Instructions
-#### Currency Class
-###### Available Instance Methods:
+### Currency Class
+#### Available Instance Methods:
 
 create_currency_mapping(:sumbol, hash_map)
 

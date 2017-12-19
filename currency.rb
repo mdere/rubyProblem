@@ -7,17 +7,14 @@ class Currency
     @currency_mappings = {}
     # Creating default us_coins mapping
     @currency_mappings[:us_coins] = {
-      mapping: {
-        quarters: 25,
-        dimes: 10,
-        nickels: 5,
-        pennies: 1  
-      }
+      quarters: 25,
+      dimes: 10,
+      nickels: 5,
+      pennies: 1
     }
     @selected_mapping_name = :us_coins
     @selected_mapping = @currency_mappings[:us_coins]
     @selected_mapping_mem_store = {}
-    create_mem_store()
   end
 
   # We will want to allow the users to be able to define
@@ -36,7 +33,7 @@ class Currency
   # mapping <Hash>
   def create_currency_mapping(mapping_name, mapping)
     if mapping_name_is_valid?(mapping_name) && mapping_is_valid?(mapping)
-      @currency_mappings[mapping_name] = mapping
+      @currency_mappings[mapping_name] = mapping[:mapping]
     else
       raise "Failed to create currency mapping, please check parameters and try again"
     end
@@ -48,7 +45,6 @@ class Currency
       @selected_mapping_name = nil
       @selected_mapping_name = map_name
       @selected_mapping = @currency_mappings[map_name]
-      create_mem_store()
     else
       raise "#{map_name} does not exist"
     end
@@ -74,23 +70,36 @@ class Currency
     @selected_mapping_name
   end
 
-  def change_for(value)
+  def change_for_non_recursive(value)
     create_mem_store()
     sanitizedValue = sanitize(value)
     if sanitizedValue && sanitizedValue > 0
-      process_currency_for(sanitizedValue)
-      return @selected_mapping_mem_store[:currency_data]
+      return non_recursive_process_currency_for(sanitizedValue)
     else
       raise "Cannot accept value #{value} of type #{value.class}"
     end
   end
 
+  def change_for(value)
+    sanitizedValue = sanitize(value)
+    data = nil
+    while value > 0
+
+    end
+  end
+
   private
-  def process_currency_for(value)
-    @selected_mapping_mem_store[:map_order].each do |mapping|
-      @selected_mapping_mem_store[:currency_data][mapping[0]] = value/mapping[1]
+  def recursive_process_currency_for(value)
+
+  end
+
+  def non_recursive_process_currency_for(value)
+    @selected_mapping_mem_store[:ordered_mapping].each do |mapping|
+      calculation = value/mapping[1]
+      @selected_mapping_mem_store[:currency_data][mapping[0]] = calculation if calculation > 0
       value = value%mapping[1]
     end
+    @selected_mapping_mem_store[:currency_data]
   end
 
   def create_mem_store()
@@ -98,18 +107,8 @@ class Currency
     # start with currency_data
     @selected_mapping_mem_store = {
       currency_data: {},
-      map_order: nil
+      ordered_mapping: get_current_currency_mapping().sort_by {|key,value| value}.reverse
     }
-    map_order = []
-    @selected_mapping[:mapping].each do |key, value|
-      @selected_mapping_mem_store[:currency_data][key] = 0
-      map_order.push([key, value])
-    end
-    # This will ensure that during processing will process the
-    # largest denomination first, so that process currency for
-    # could have smaller logic
-    map_order.sort!{|x,y| y[1] <=> x[1]}
-    @selected_mapping_mem_store[:map_order] = map_order
   end
 
   def sanitize(value)

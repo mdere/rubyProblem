@@ -39,7 +39,7 @@ end
 
 def change_for(value)
   begin
-    puts "Get change for #{value} <#{value.class}>: #{$currency.change_for(value)}"
+    puts "Get change for #{value} <#{value.class}>: #{$currency.change_for_non_recursive(value)}"
   rescue => e
     puts "cant get change: #{e.message}"
   end
