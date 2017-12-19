@@ -22,10 +22,14 @@
 We are looking for something that could potentially be used as a robust, production-quality solution. So, please take your time before submitting your solution. Be preapred to talk about your code during the next round of interviews.
 
 ## Instructions
+### Main.rb
+
+just run `ruby main.rb`
+
 ### Currency Class
 #### Available Instance Methods:
 
-create_currency_mapping(:sumbol, hash_map)
+**create_currency_mapping(:sumbol, hash_map)**
 
 If you pass in a correct symbol name for the currency_name and correct hash_map, it will successfully create a new currency.
 
@@ -44,3 +48,31 @@ create_currency_mapping(:new_us_coins, {
 })
 ```
 If any key is not a symbol or any value is not an integer, an exception will be raised.
+
+**set_mapping_for(map_name)**
+
+If you pass a symbol map_name it should set the correct mapping if the map_name exists
+
+**get_available_currency_map_names()**
+
+This will return an array of map_names
+
+**get_currency_mapping_for(map_name)**
+
+This will return an existing mapping for map_name if it exists
+
+**get_current_currency_mapping()**
+
+This will return current selected mapping to be processed against
+
+**get_current_currency_map_name()**
+
+This will return current selected mapping name
+
+**change_for_non_recursive(value)**
+
+If you pass in an Integer value, it should return back a hash of information based on the mapping selected
+
+**change_for(value)**
+
+If you pass in an Integer value, it should return back a hash of information based on the mapping selected

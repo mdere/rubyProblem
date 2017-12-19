@@ -81,8 +81,8 @@ class Currency
   end
 
   def change_for(value)
+    create_mem_store()
     sanitizedValue = sanitize(value)
-    data = nil
     while value > 0
 
     end
