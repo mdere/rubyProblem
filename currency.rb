@@ -6,10 +6,13 @@ class Currency
   def initialize()
     @currency_mappings = {}
     @currency_mappings[:us_coins] = {
-      quarters: 25,
-      dimes: 10,
-      nickels: 5,
-      pennies: 1
+      mapping: {
+        quarters: 25,
+        dimes: 10,
+        nickels: 5,
+        pennies: 1  
+      },
+      denomination: 100
     }
     @selected_mapping = @currency_mappings[:us_coins]
     @selected_mapping_mem_store = {}
@@ -91,7 +94,7 @@ class Currency
       map_order: nil
     }
     map_order = []
-    @selected_mapping.each do |key, value|
+    @selected_mapping[:mapping].each do |key, value|
       @selected_mapping_mem_store[:currency_data][key] = 0
       map_order.push([key, value])
     end
@@ -106,19 +109,18 @@ class Currency
     # We will need to check if the string is
     # intended as an numerical
     # Ignore floats for now
-    if value.is_a?(String)
-      return value.is_a_number? ? value.to_i : nil
-    end 
+    if value.is_a?(String) && value.is_a_number?
+
+    end
     # Check if Interger already OR float
     # Just floor the Float for now
-    if value.is_a?(Integer) || value.is_a?(Float)
-      return value.floor
-    end
+    return value.is_a?(Integer) ? value
     return nil
   end
 
   def mapping_exists(mapping_name)
-    return @currency_mappings[mapping_name] && !@currency_mappings[mapping_name].empty?
+    return @currency_mappings[mapping_name] &&
+           !@currency_mappings[mapping_name].empty?
   end
 
   # for now I will only accept symbols
@@ -132,8 +134,18 @@ class Currency
     if mapping && mapping.keys.length > 0
       # Lets checks if keys are valid
       mapping.each do |key, value|
-        if !(key && key.class == Symbol && value && value.to_i > 0)
-          return false
+        if !(key && key.class == Symbol)
+          if (key == :mapping)
+            mapping[key].each do |coin_name, coin_value|
+              return false if !(coin_name &&
+                              coin_name.class == Symbol &&
+                              coin_value &&
+                              coin_value > 0)
+            end
+          end
+          if (key == :denomination)
+            mapping[key] > 0 
+          end
         end
       end
     end
