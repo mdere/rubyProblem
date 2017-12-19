@@ -4,8 +4,4 @@ class String
     return false if /^\d*\.\d*$/.match(self)
     Integer(self) != nil rescue false
   end
-
-  def convert_to_number()
-
-  end
 end

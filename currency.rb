@@ -81,16 +81,12 @@ class Currency
   end
 
   def change_for(value)
-    create_mem_store()
-    sanitizedValue = sanitize(value)
-    while value > 0
-
-    end
+    # not implemented
   end
 
   private
   def recursive_process_currency_for(value)
-
+    # not implemented
   end
 
   def non_recursive_process_currency_for(value)
