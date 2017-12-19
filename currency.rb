@@ -5,15 +5,16 @@ class Currency
   
   def initialize()
     @currency_mappings = {}
+    # Creating default us_coins mapping
     @currency_mappings[:us_coins] = {
       mapping: {
         quarters: 25,
         dimes: 10,
         nickels: 5,
         pennies: 1  
-      },
-      denomination: 100
+      }
     }
+    @selected_mapping_name = :us_coins
     @selected_mapping = @currency_mappings[:us_coins]
     @selected_mapping_mem_store = {}
     create_mem_store()
@@ -34,7 +35,7 @@ class Currency
   # list held in memory that takes in mapping_name <String>
   # mapping <Hash>
   def create_currency_mapping(mapping_name, mapping)
-    if mapping_name_is_valid(mapping_name) && mapping_is_valid(mapping)
+    if mapping_name_is_valid?(mapping_name) && mapping_is_valid?(mapping)
       @currency_mappings[mapping_name] = mapping
     else
       raise "Failed to create currency mapping, please check parameters and try again"
@@ -44,6 +45,8 @@ class Currency
   def set_mapping_for(map_name)
     if mapping_exists(map_name)
       @selected_mapping = nil
+      @selected_mapping_name = nil
+      @selected_mapping_name = map_name
       @selected_mapping = @currency_mappings[map_name]
       create_mem_store()
     else
@@ -56,15 +59,19 @@ class Currency
     @currency_mappings.each do | key, value |
       array_of_names.push(key)
     end
-    return array_of_names
+    array_of_names
   end
 
-  def get_currency_map_info(map_name)
-    return @currency_mappings[map_name]
+  def get_currency_mapping_for(map_name)
+    @currency_mappings[map_name]
   end
 
-  def get_current_currency_map_info()
-    return @selected_mapping
+  def get_current_currency_mapping()
+    @selected_mapping
+  end
+
+  def get_current_currency_map_name()
+    @selected_mapping_name
   end
 
   def change_for(value)
@@ -108,13 +115,12 @@ class Currency
   def sanitize(value)
     # We will need to check if the string is
     # intended as an numerical
-    # Ignore floats for now
-    if value.is_a?(String) && value.is_a_number?
-
+    if value.is_a?(String) && value.is_an_integer?()
+      return value.to_i
     end
     # Check if Interger already OR float
     # Just floor the Float for now
-    return value.is_a?(Integer) ? value
+    return value if value.is_a?(Integer) 
     return nil
   end
 
@@ -124,28 +130,28 @@ class Currency
   end
 
   # for now I will only accept symbols
-  def mapping_name_is_valid(mapping_name)
+  def mapping_name_is_valid?(mapping_name)
     mapping_name.class == Symbol
   end
 
   # Check if there are valid key and value
-  def mapping_is_valid(mapping)
+  def mapping_is_valid?(mapping)
     # lets make sure mapping and keys exist first
     if mapping && mapping.keys.length > 0
       # Lets checks if keys are valid
       mapping.each do |key, value|
-        if !(key && key.class == Symbol)
+        if key && key.class == Symbol
           if (key == :mapping)
             mapping[key].each do |coin_name, coin_value|
               return false if !(coin_name &&
-                              coin_name.class == Symbol &&
+                              ( coin_name.is_a?(Symbol) || coin_name.is_a?(String) ) &&
                               coin_value &&
+                              coin_value.is_a?(Integer) &&
                               coin_value > 0)
             end
           end
-          if (key == :denomination)
-            mapping[key] > 0 
-          end
+        else
+          return false
         end
       end
     end
